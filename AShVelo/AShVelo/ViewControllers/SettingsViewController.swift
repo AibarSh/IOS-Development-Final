@@ -16,20 +16,40 @@ enum AppTheme: String {
 
 class SettingsViewController: UIViewController {
 
-    @IBOutlet weak var themeLabel: UILabel!
-    @IBOutlet weak var myPopUpButton: UIButton!
+    @IBOutlet weak var themeSelectionButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Settings"
+//        setupThemeMenu()
         updateThemeDisplay()
     }
     private func updateThemeDisplay() {
         let currentTheme = UserDefaults.standard.string(forKey: "SelectedTheme") ?? AppTheme.automatic.rawValue
-        themeLabel.text = currentTheme
         applyTheme(theme: AppTheme(rawValue: currentTheme) ?? .automatic)
     }
-
+    
+//    private func setupThemeMenu() {
+//        let currentThemeStr = UserDefaults.standard.string(forKey: "SelectedTheme") ?? AppTheme.automatic.rawValue
+//        
+//        let handler: UIActionHandler = { [weak self] action in
+//            let selectedTheme: AppTheme = AppTheme(rawValue: action.title) ?? .automatic
+//            self?.handleThemeSelection(theme: selectedTheme)
+//        }
+//
+//        let actions = [AppTheme.automatic, AppTheme.light, AppTheme.dark].map { theme in
+//            UIAction(
+//                title: theme.rawValue,
+//                state: theme.rawValue == currentThemeStr ? .on : .off,
+//                handler: handler
+//            )
+//        }
+//
+//        let menu = UIMenu(title: "Select Theme", children: actions)
+//        themeSelectionButton.menu = menu
+//        themeSelectionButton.showsMenuAsPrimaryAction = true
+//        themeSelectionButton.changesSelectionAsPrimaryAction = true
+//    }
     @IBAction func clearCacheTapped(_ sender: UIButton) {
 
         let alert = UIAlertController(title: "Clear Cache", message: "This will delete all stored temporary data and search history. Continue?", preferredStyle: .alert)
@@ -39,10 +59,6 @@ class SettingsViewController: UIViewController {
              if let bundleID = Bundle.main.bundleIdentifier {
                  UserDefaults.standard.removePersistentDomain(forName: bundleID)
              }
-
-            // 2. Clear image cache or database files (If you implemented them)
-            // Example:
-            // try? FileManager.default.removeItem(atPath: NSTemporaryDirectory())
 
             let successAlert = UIAlertController(title: "Success", message: "Cache has been cleared.", preferredStyle: .alert)
             successAlert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -55,14 +71,10 @@ class SettingsViewController: UIViewController {
     }
 
     func handleThemeSelection(theme: AppTheme) {
-        // 1. Save the user's preference
-        UserDefaults.standard.set(theme.rawValue, forKey: "SelectedTheme")
         
-        // 2. Apply the theme immediately
+        UserDefaults.standard.set(theme.rawValue, forKey: "SelectedTheme")
         applyTheme(theme: theme)
         
-        // 3. Update the UI label
-        themeLabel.text = theme.rawValue
     }
     
     private func applyTheme(theme: AppTheme) {
@@ -75,12 +87,9 @@ class SettingsViewController: UIViewController {
             view.window?.overrideUserInterfaceStyle = .light
         }
     }
-    
-    // NOTE: For the Menu Button in Storyboard, you will need to map the three menu items
-    // (Automatic, Dark, Light) to call 'handleThemeSelection(theme:)' using their respective values.
-
+ 
     @IBAction func appInstructionsTapped(_ sender: UIButton) {
-        let gitHubURLString = "https://github.com/yourusername/AShVelo/docs"
+        let gitHubURLString = "https://github.com/AibarSh/IOS-Development-Final/blob/main/README.md"
         
         if let url = URL(string: gitHubURLString) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)

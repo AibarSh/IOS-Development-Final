@@ -9,19 +9,24 @@ import UIKit
 
 class BikePartsViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
-    
+   
     let componentCategories = ["Frame", "Suspension", "Wheels", "Groupset", "Hubs"]
     
     var selectedComponents: [String: String] = [:]
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.title = "Build Your Search"
         tableView.dataSource = self
         tableView.delegate = self
     }
     
+    @IBAction func resetSearchTapped(_ sender: UIBarButtonItem) {
+        selectedComponents.removeAll()
+        tableView.reloadData()
+    }
     @IBAction func checkBikesButtonTapped(_ sender: UIButton) {
-        
+
         let queryParts = selectedComponents.values.joined(separator: " ")
 
         if queryParts.isEmpty {
@@ -34,46 +39,63 @@ class BikePartsViewController: UIViewController {
         performSegue(withIdentifier: "ShowBikeResults", sender: queryParts)
     }
 
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        if segue.identifier == "ShowBikeResults",
-//           let resultsVC = segue.destination as? BikeResultsViewController,
-//           let searchQuery = sender as? String {
-//
-//            resultsVC.searchQuery = searchQuery
-//        }
-//    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+
+        if segue.identifier == "ShowComponentPicker",
+           let pickerVC = segue.destination as? ComponentPickerViewController,
+           let category = sender as? String {
+            
+            pickerVC.categoryTitle = category
+            pickerVC.delegate = self
+        }
+        
+        if segue.identifier == "ShowBikeResults",
+           let resultsVC = segue.destination as? BikeResultsViewController,
+           let searchQuery = sender as? String {
+            resultsVC.searchQuery = searchQuery
+        }
+    }
 }
 
-extension BikePartsViewController: UITableViewDataSource{
+// TableView Logic
+extension BikePartsViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return componentCategories.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        // Assuming you use a standard UITableViewCell for simplicity here
         let cell = tableView.dequeueReusableCell(withIdentifier: "ComponentCell", for: indexPath)
-        
         let category = componentCategories[indexPath.row]
+        
         cell.textLabel?.text = category
-        cell.accessoryType = .disclosureIndicator
+        cell.textLabel?.font = .systemFont(ofSize: 20)
         
         if let selectedPart = selectedComponents[category] {
             cell.detailTextLabel?.text = selectedPart
-        }
-        else {
+            cell.detailTextLabel?.textColor = .systemBlue
+            cell.detailTextLabel?.font = .systemFont(ofSize: 20)
+        } else {
             cell.detailTextLabel?.text = "Select Part"
+            cell.detailTextLabel?.textColor = .lightGray
+            cell.detailTextLabel?.font = .systemFont(ofSize: 20)
         }
         
+        cell.accessoryType = .disclosureIndicator
         return cell
     }
-}
-extension BikePartsViewController: UITableViewDelegate{
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
         let selectedCategory = componentCategories[indexPath.row]
-
         performSegue(withIdentifier: "ShowComponentPicker", sender: selectedCategory)
+    }
+    
+}
+
+extension BikePartsViewController: ComponentPickerDelegate {
+    func didSelectComponent(_ part: String, for category: String) {
+        
+        selectedComponents[category] = part        
+        tableView.reloadData()
     }
 }

@@ -10,6 +10,7 @@ import UIKit
 class ViewController: UIViewController, MenuCellDelegate {
 
     @IBOutlet weak var tableView: UITableView!
+    
     let menuItems = [
         "Search Bikes By Component",
         "Current Bikes",
@@ -23,28 +24,31 @@ class ViewController: UIViewController, MenuCellDelegate {
         tableView.delegate = self
     }
     
-    @IBAction func SettingsButton(_ sender: Any) {
+    @IBAction func settingsButtonTapped(_ sender: Any) {
         performSegue(withIdentifier: "ShowSettings", sender: nil)
     }
     
     
     func menuCellDidTapButton(cell: MenuCell, itemTitle: String) {
             
-            // Use the itemTitle to decide which screen to navigate to
             switch itemTitle {
             case "Search Bikes By Component":
                 performSegue(withIdentifier: "ShowComponentSearch", sender: nil)
             case "Current Bikes":
                 performSegue(withIdentifier: "ShowCurrentBikes", sender: nil)
             case "Guidelines":
-                print("Tapped Guidelines button.")
+                openURL("https://www.bike24.com/advice/buyers-guides/how-to-choose-a-bike?referrer=https%3A%2F%2Fwww.google.com%2F")
             case "Watch more":
-                // Open a web view or external link
-                print("Tapped Watch More button.")
+                openURL("https://www.youtube.com/@gmbn")
             default:
                 break
             }
         }
+    
+    private func openURL(_ urlString: String) {
+        guard let url = URL(string: urlString) else { return }
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+    }
 }
 
 
